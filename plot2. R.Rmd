@@ -1,0 +1,67 @@
+---
+title: "plot2. R"
+author: "MS"
+date: "2025-01-05"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(sqldf)
+```
+
+```{r}
+query <- "SELECT * FROM file WHERE Date IN ('1/2/2007', '2/2/2007')"
+data <- read.csv.sql("C:/Users/sumim/OneDrive/ドキュメント/Coursera datascience/Exploratory Data Analysis/household_power_consumption.txt",
+                     sql = query, sep = ";",
+                     header = TRUE)
+
+closeAllConnections()
+```
+
+```{r}
+data[data == "?"] <- NA
+
+data[, 3:9] <- lapply(data[, 3:9], as.numeric)
+```
+
+```{r}
+sum(is.na(data$Date))
+sum(is.na(data$Time))
+```
+
+```{r}
+data$Datetime <- strptime(paste(data$Date, data$Time), format = "%d/%m/%Y %H:%M:%S")
+```
+
+```{r}
+str(data)
+```
+
+```{r}
+getwd()
+```
+
+```{r}
+png("C:/Users/sumim/OneDrive/ドキュメント/Coursera datascience/Exploratory Data Analysis/plot2.png", width = 480, height = 480)
+
+data$Weekday <- weekdays(data$Datetime)
+
+plot(data$Datetime, data$Global_active_power, type = "l", col = "black",
+     xlab = "", ylab = "Global Active Power (kilowatts)",
+     main = "Global Active Power over Time", xaxt = "n")
+
+axis(1, at = seq(min(data$Datetime), max(data$Datetime), by = "days"),
+     labels = weekdays(seq(min(data$Datetime), max(data$Datetime), by = "days")))
+
+dev.off()
+```
